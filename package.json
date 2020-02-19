@@ -1,0 +1,16 @@
+{
+  "name": "MaratonaDev-3ed",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon server.js"
+  },
+  "repository": "https://github.com/ArlanBiati/MaratonaDev-3ed.git",
+  "author": "ArlanBiati <arlangustavo@hotmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.17.1",
+    "nodemon": "^2.0.2",
+    "nunjucks": "^3.2.0"
+  }
+}
