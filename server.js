@@ -11,6 +11,17 @@ server.use(express.static('public'))
 server.use(express.urlencoded({ extended: true }))
 
 
+// Configurar a conexão com o banco dedados
+const pool = require('pg').Pool
+const db = new pool({
+  user: 'postgres',
+  password: '0000',
+  host: 'localhost',
+  port: 5432,
+  database: 'doe'
+})
+
+
 // Configurando a template engine
 const nunjucks = require("nunjucks")
 nunjucks.configure("./", {
@@ -19,17 +30,17 @@ nunjucks.configure("./", {
 })
 
 
-// Lista de doadores: Array
-const donors = [
-  {
-    name: "Arlan Biati",
-    blood: "O-"
-  }
-]
-
 // Configurar a apresentação da página
 server.get("/", function(req, res) {
-  return res.render("index.html", { donors })
+  
+  db.query("SELECT * FROM donors", function (err, result) {
+    if (err) return res.send("Errp de banco de dados.")
+
+
+    const donors = result.rows
+    return res.render("index.html", { donors })
+  })
+
 })
 
 
@@ -40,14 +51,28 @@ server.post("/", function(req, res) {
   const blood = req.body.blood
 
 
-  // Colocar valores dentro do array
-  donors.push({
-    name: name,
-    blood: blood,
+  //Se o nome = vazio, ou email = vazio, ou sangue = vazio
+
+  if (name == "" || email == "" || blood == "") {
+    return res.send("Todos os campos são obrigatórios.")
+  }
+
+  // Colocar valores dentro do banco de dados
+  const query = `
+    INSERT INTO donors ("name", "email", "blood")
+    VALUES ($1,  $2, $3)`
+
+  const values = [name, email, blood]
+
+
+  db.query(query, values, function(err) {
+    // Fluxo de erro
+    if (err) return res.send("erro no banco de dados.")
+
+    // Fluxo ideal
+    return res.redirect("/")
   })
 
-
-  return res.redirect("/")
 })
 
 
